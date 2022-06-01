@@ -150,6 +150,12 @@
 #define PN532_GPIO_P34 (4)
 #define PN532_GPIO_P35 (5)
 
+  #ifdef ESP32
+  #define SPI_FREQUENCY 100000
+  #else
+  #define SPI_FREQUENCY 1000000
+  #endif
+
 class Adafruit_PN532 {
 public:
   Adafruit_PN532(uint8_t clk, uint8_t miso, uint8_t mosi,
