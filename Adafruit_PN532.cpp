@@ -68,8 +68,8 @@ byte pn532response_firmwarevers[] = {0x00, 0x00, 0xFF, 0x06, 0xFA, 0xD5};
 // Uncomment these lines to enable debug output for PN532(SPI) and/or MIFARE
 // related code
 
-// #define PN532DEBUG
-// #define MIFAREDEBUG
+#define PN532DEBUG
+#define MIFAREDEBUG
 
 // If using Native Port on Arduino Zero or Due define as SerialUSB
 #define PN532DEBUGPRINT Serial
@@ -516,7 +516,7 @@ bool Adafruit_PN532::readPassiveTargetID(uint8_t cardbaudrate, uint8_t *uid,
   pn532_packetbuffer[1] = 1; // max 1 cards at once (we can set this to 2 later)
   pn532_packetbuffer[2] = cardbaudrate;
 
-  if (pn532_packetbuffer == 0) {
+  if (cardbaudrate == 0) {
     if (!sendCommandCheckAck(pn532_packetbuffer, 3, timeout)) {
   #ifdef PN532DEBUG
       PN532DEBUGPRINT.println(F("No card(s) read"));
@@ -941,11 +941,11 @@ uint8_t Adafruit_PN532::mifareclassic_AuthenticateBlock(uint8_t *uid,
 
 #ifdef MIFAREDEBUG
   PN532DEBUGPRINT.print(F("Trying to authenticate card "));
-  Adafruit_PN532::PrintHex(_uid, _uidLen);
+  Adafruit_PN532::PrintHex((const byte *)(_uid), _uidLen);
   PN532DEBUGPRINT.print(F("Using authentication KEY "));
   PN532DEBUGPRINT.print(keyNumber ? 'B' : 'A');
   PN532DEBUGPRINT.print(F(": "));
-  Adafruit_PN532::PrintHex(_key, 6);
+  Adafruit_PN532::PrintHex((const byte *)(_key), 6);
 #endif
 
   // Prepare the authentication command //
