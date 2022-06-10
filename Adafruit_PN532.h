@@ -92,6 +92,7 @@
 #define PN532_I2C_READYTIMEOUT (20)
 
 #define PN532_MIFARE_ISO14443A (0x00)
+#define PN532_MIFARE_ISO14443B (0x03)
 
 // Mifare Commands
 #define MIFARE_CMD_AUTH_A (0x60)
@@ -178,7 +179,7 @@ public:
       uint8_t cardbaudrate, uint8_t *uid, uint8_t *uidLength,
       uint16_t timeout = 0); // timeout 0 means no timeout - will block forever.
   bool startPassiveTargetIDDetection(uint8_t cardbaudrate);
-  bool readDetectedPassiveTargetID(uint8_t *uid, uint8_t *uidLength);
+  bool readDetectedPassiveTargetID(uint8_t *uid, uint8_t *uidLength, uint8_t cardbaudrate);
   bool inDataExchange(uint8_t *send, uint8_t sendLength, uint8_t *response,
                       uint8_t *responseLength);
   bool inListPassiveTarget();
