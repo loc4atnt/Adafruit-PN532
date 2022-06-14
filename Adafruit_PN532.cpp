@@ -517,6 +517,9 @@ bool Adafruit_PN532::readPassiveTargetID(uint8_t cardbaudrate, uint8_t *uid,
   pn532_packetbuffer[2] = cardbaudrate;
 
   if (cardbaudrate == 0) {
+    #ifdef PN532DEBUG
+      PN532DEBUGPRINT.println(F("READ Type A"));
+  #endif
     if (!sendCommandCheckAck(pn532_packetbuffer, 3, timeout)) {
   #ifdef PN532DEBUG
       PN532DEBUGPRINT.println(F("No card(s) read"));
@@ -524,6 +527,9 @@ bool Adafruit_PN532::readPassiveTargetID(uint8_t cardbaudrate, uint8_t *uid,
       return 0x0; // no cards read
     }
   } else {
+   #ifdef PN532DEBUG
+      PN532DEBUGPRINT.println(F("READ Type B"));
+  #endif
     pn532_packetbuffer[3] = 0;
     if (!sendCommandCheckAck(pn532_packetbuffer, 4, timeout)) {
   #ifdef PN532DEBUG
@@ -1807,36 +1813,48 @@ uint8_t Adafruit_PN532::AsTarget() {
       uint8_t packet[8 + cmdlen];
       uint8_t *p = packet;
       cmdlen++;
+    //   spi_write(PN532_SPI_DATAWRITE);
 
-      p[0] = PN532_SPI_DATAWRITE;
+    // checksum = PN532_PREAMBLE + PN532_PREAMBLE + PN532_STARTCODE2;
+    // spi_write(PN532_PREAMBLE);
+    // spi_write(PN532_PREAMBLE);
+    // spi_write(PN532_STARTCODE2);
+
+    // spi_write(cmdlen);
+    // spi_write(~cmdlen + 1);
+
+    // spi_write(PN532_HOSTTOPN532);
+    // checksum += PN532_HOSTTOPN532;
+
+      p[0] = PN532_SPI_DATAWRITE;//0
       p++;
 
-      p[0] = PN532_PREAMBLE;
+      p[0] = PN532_PREAMBLE;//1
       p++;
-      p[0] = PN532_STARTCODE1;
+      p[0] = PN532_STARTCODE1;//2
       p++;
-      p[0] = PN532_STARTCODE2;
+      p[0] = PN532_STARTCODE2;//3
       p++;
       checksum = PN532_PREAMBLE + PN532_STARTCODE1 + PN532_STARTCODE2;
 
-      p[0] = cmdlen;
+      p[0] = cmdlen;//4
       p++;
-      p[0] = ~cmdlen + 1;
+      p[0] = ~cmdlen + 1;//5
       p++;
 
-      p[0] = PN532_HOSTTOPN532;
+      p[0] = PN532_HOSTTOPN532;//6
       p++;
       checksum += PN532_HOSTTOPN532;
 
       for (uint8_t i = 0; i < cmdlen - 1; i++) {
-        p[0] = cmd[i];
-        p++;
-        checksum += cmd[i];
+        p[0] = cmd[i];//7
+        p++;//8
+        checksum += cmd[i];//9
       }
 
-      p[0] = ~checksum;
+      p[0] = ~checksum;//10
       p++;
-      p[0] = PN532_POSTAMBLE;
+      p[0] = PN532_POSTAMBLE;//11
       p++;
 
 #ifdef PN532DEBUG
